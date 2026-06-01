@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Bolton Practice — GP Appointment</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --nhs: #005EB8;
+    --nhs-dark: #003F7F;
+    --nhs-light: #E8F1FA;
+    --green: #007A53;
+    --white: #ffffff;
+    --off: #F4F7FB;
+    --text: #1a1a2e;
+    --muted: #6b7a99;
+    --bubble-helen: #EAF2FF;
+    --bubble-user: #005EB8;
+    --radius: 18px;
+  }
+
+  html, body {
+    height: 100%;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--off);
+    color: var(--text);
+    overflow: hidden;
+  }
+
+  .phone {
+    max-width: 390px;
+    height: 100dvh;
+    margin: 0 auto;
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--nhs);
+    padding: 52px 20px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .header-logo {
+    width: 40px; height: 40px;
+    background: var(--white);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .header-logo svg { width: 26px; height: 26px; }
+  .header-text h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px;
+    color: var(--white);
+    line-height: 1.2;
+  }
+  .header-text p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.75);
+    font-weight: 300;
+  }
+  .header-status {
+    margin-left: auto;
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.85);
+  }
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #4ade80;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* HOME SCREEN */
+  #home-screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 24px;
+    gap: 28px;
+  }
+  .welcome-card {
+    background: var(--nhs-light);
+    border-radius: var(--radius);
+    padding: 20px;
+    width: 100%;
+    border-left: 4px solid var(--nhs);
+  }
+  .welcome-card h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--nhs-dark);
+    margin-bottom: 4px;
+  }
+  .welcome-card p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* BIG MIC BUTTON */
+  .mic-button {
+    width: 130px; height: 130px;
+    border-radius: 50%;
+    background: var(--nhs);
+    border: none;
+    cursor: pointer;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 6px;
+    box-shadow: 0 8px 32px rgba(0,94,184,0.35);
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mic-button:active { transform: scale(0.95); }
+  .mic-button svg { width: 38px; height: 38px; color: white; }
+  .mic-button span { font-size: 12px; color: rgba(255,255,255,0.9); font-weight: 500; }
+  .mic-ring {
+    position: absolute;
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    border: 2px solid rgba(0,94,184,0.3);
+    animation: ring 2.5s ease-out infinite;
+    display: none;
+  }
+  .mic-ring:nth-child(2) { animation-delay: 0.8s; }
+  .mic-ring:nth-child(3) { animation-delay: 1.6s; }
+  @keyframes ring {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(1.6); opacity: 0; }
+  }
+  .mic-button.active .mic-ring { display: block; }
+  .mic-button.active { background: #e53e3e; box-shadow: 0 8px 32px rgba(229,62,62,0.35); }
+
+  .or-divider {
+    display: flex; align-items: center; gap: 12px;
+    width: 100%;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .or-divider::before, .or-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e2e8f0;
+  }
+
+  .type-btn {
+    width: 100%;
+    padding: 14px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    background: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.2s, background 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .type-btn:hover, .type-btn:active { border-color: var(--nhs); background: var(--nhs-light); }
+
+  .disclaimer {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  /* CHAT SCREEN */
+  #chat-screen {
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Status bar */
+  .status-bar {
+    background: rgba(0,94,184,0.06);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(0,94,184,0.1);
+  }
+  .waveform-bars {
+    display: flex; align-items: center; gap: 3px;
+    height: 28px;
+  }
+  .waveform-bars span {
+    width: 3px;
+    border-radius: 2px;
+    background: var(--nhs);
+    height: 6px;
+    transition: height 0.15s;
+  }
+  .waveform-bars.active span { animation: wave 0.8s ease-in-out infinite; }
+  .waveform-bars.active span:nth-child(1) { animation-delay: 0s; }
+  .waveform-bars.active span:nth-child(2) { animation-delay: 0.1s; }
+  .waveform-bars.active span:nth-child(3) { animation-delay: 0.2s; }
+  .waveform-bars.active span:nth-child(4) { animation-delay: 0.3s; }
+  .waveform-bars.active span:nth-child(5) { animation-delay: 0.4s; }
+  .waveform-bars.active span:nth-child(6) { animation-delay: 0.3s; }
+  .waveform-bars.active span:nth-child(7) { animation-delay: 0.2s; }
+  @keyframes wave {
+    0%,100% { height: 4px; }
+    50% { height: 22px; }
+  }
+  .status-label {
+    font-size: 12px;
+    color: var(--nhs);
+    font-weight: 500;
+  }
+  .end-btn {
+    margin-left: auto;
+    padding: 6px 14px;
+    background: #fee2e2;
+    border: 1px solid #fca5a5;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #dc2626;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Messages */
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .bubble {
+    max-width: 82%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.5;
+    animation: bubbleIn 0.2s ease-out;
+  }
+  @keyframes bubbleIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .bubble.helen {
+    background: var(--bubble-helen);
+    color: var(--text);
+    border-bottom-left-radius: 4px;
+    align-self: flex-start;
+  }
+  .bubble.helen .sender {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--nhs);
+    margin-bottom: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .bubble.user {
+    background: var(--bubble-user);
+    color: white;
+    border-bottom-right-radius: 4px;
+    align-self: flex-end;
+  }
+
+  /* Typing dots */
+  .typing-indicator {
+    display: none;
+    gap: 4px;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--bubble-helen);
+    border-radius: 18px;
+    border-bottom-left-radius: 4px;
+    align-self: flex-start;
+    width: fit-content;
+    margin: 0 16px;
+  }
+  .typing-indicator span {
+    width: 6px; height: 6px;
+    background: var(--muted);
+    border-radius: 50%;
+    animation: typing 1.2s infinite;
+  }
+  .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typing { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+  /* Input bar */
+  .input-bar {
+    padding: 12px 16px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+    background: var(--white);
+    border-top: 1px solid #e8eef5;
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+    flex-shrink: 0;
+  }
+  .input-bar textarea {
+    flex: 1;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 10px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    max-height: 100px;
+    line-height: 1.4;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  .input-bar textarea:focus { border-color: var(--nhs); }
+  .send-btn, .voice-btn {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .send-btn:active, .voice-btn:active { transform: scale(0.9); }
+  .send-btn { background: var(--nhs); }
+  .send-btn svg { color: white; width: 18px; height: 18px; }
+  .voice-btn { background: var(--off); border: 1.5px solid #e2e8f0; }
+  .voice-btn svg { color: var(--nhs); width: 18px; height: 18px; }
+  .voice-btn.recording { background: #fee2e2; border-color: #e53e3e; }
+  .voice-btn.recording svg { color: #e53e3e; }
+
+  /* ElevenLabs widget — visible but positioned off-screen */
+  elevenlabs-convai {
+    position: fixed;
+    bottom: -9999px;
+    right: 0;
+    z-index: -1;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Connection status toast */
+  .toast {
+    position: fixed;
+    top: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1a2e;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-logo">
+      <svg viewBox="0 0 26 26" fill="none">
+        <circle cx="13" cy="13" r="12" fill="#005EB8"/>
+        <polyline points="4,13 8,13 10,8 13,18 16,10 18,13 22,13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>Bolton Practice</h1>
+      <p>GP appointment booking</p>
+    </div>
+    <div class="header-status">
+      <div class="status-dot"></div>
+      <span>Online</span>
+    </div>
+  </div>
+
+  <!-- HOME SCREEN -->
+  <div id="home-screen">
+    <div class="welcome-card">
+      <h2>Hello, welcome</h2>
+      <p>Tap the microphone to speak with Helen, our AI receptionist. She will help you book a GP appointment.</p>
+    </div>
+
+    <button class="mic-button" id="start-voice-btn" onclick="startVoiceSession()">
+      <div class="mic-ring"></div>
+      <div class="mic-ring"></div>
+      <div class="mic-ring"></div>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+        <line x1="12" y1="19" x2="12" y2="23"/>
+        <line x1="8" y1="23" x2="16" y2="23"/>
+      </svg>
+      <span>Tap to speak</span>
+    </button>
+
+    <div class="or-divider">or</div>
+
+    <button class="type-btn" onclick="startTypeMode()">Type your message instead</button>
+
+    <p class="disclaimer">⚠️ Research prototype — not a real GP service<br>University of Roehampton · MSc Digital Health</p>
+  </div>
+
+  <!-- CHAT SCREEN -->
+  <div id="chat-screen">
+    <div class="status-bar">
+      <div class="waveform-bars" id="waveform">
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <span class="status-label" id="status-label">Connecting to Helen...</span>
+      <button class="end-btn" onclick="endSession()">End call</button>
+    </div>
+
+    <div class="messages" id="messages">
+      <!-- Messages appear here -->
+    </div>
+
+    <div class="typing-indicator" id="typing">
+      <span></span><span></span><span></span>
+    </div>
+
+    <div class="input-bar" id="input-bar" style="display:none;">
+      <textarea id="msg-input" placeholder="Type your message..." rows="1"
+        oninput="autoResize(this)"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendText();}">
+      </textarea>
+      <button class="send-btn" onclick="sendText()" title="Send">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+<!-- ElevenLabs widget — kept in DOM so it can connect, just hidden visually -->
+<elevenlabs-convai agent-id="agent_6701kt0ajthff0k8qws2fwhwpw47"></elevenlabs-convai>
+<script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
+
+<script>
+  const messagesEl = document.getElementById('messages');
+  const typingEl = document.getElementById('typing');
+  const waveformEl = document.getElementById('waveform');
+  const statusLabel = document.getElementById('status-label');
+  let isVoiceMode = false;
+  let sessionActive = false;
+  let widgetReady = false;
+
+  // ── Toast helper ──
+  function showToast(msg, duration = 2500) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), duration);
+  }
+
+  // ── Switch to chat screen ──
+  function showChatScreen() {
+    document.getElementById('home-screen').style.display = 'none';
+    document.getElementById('chat-screen').style.display = 'flex';
+    sessionActive = true;
+  }
+
+  // ── Add a message bubble ──
+  function addBubble(text, who) {
+    const div = document.createElement('div');
+    div.className = 'bubble ' + who;
+    if (who === 'helen') {
+      div.innerHTML = '<div class="sender">Helen · Bolton Practice</div>' + text.replace(/</g,'&lt;');
+    } else {
+      div.textContent = text;
+    }
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return div;
+  }
+
+  // ── Set waveform state ──
+  function setStatus(text, animating) {
+    statusLabel.textContent = text;
+    if (animating) {
+      waveformEl.classList.add('active');
+    } else {
+      waveformEl.classList.remove('active');
+    }
+  }
+
+  // ── VOICE MODE: tap the big mic to start ElevenLabs ──
+  function startVoiceSession() {
+    isVoiceMode = true;
+    showChatScreen();
+    setStatus('Starting Helen...', true);
+
+    // Wait for widget to be ready then start the call
+    const widget = document.querySelector('elevenlabs-convai');
+    if (!widget) {
+      showToast('Widget not loaded yet — please wait a moment and try again.');
+      return;
+    }
+
+    // Try to start the conversation
+    tryStartCall(widget, 0);
+  }
+
+  function tryStartCall(widget, attempt) {
+    if (attempt > 20) {
+      // Widget took too long — show text mode as fallback
+      setStatus('Voice unavailable — type below', false);
+      document.getElementById('input-bar').style.display = 'flex';
+      addBubble("Hello, Bolton Practice, Helen speaking. How can I help you today? (Please type your message below — voice did not connect on this device.)", 'helen');
+      showToast('Voice could not start. Please type instead.');
+      return;
+    }
+
+    // Check if the widget has a startSession or similar method
+    if (widget.shadowRoot || widget.startSession || widget.startCall || widgetReady) {
+      // Attempt to trigger the widget's call start
+      try {
+        if (typeof widget.startSession === 'function') {
+          widget.startSession();
+        } else if (typeof widget.startCall === 'function') {
+          widget.startCall();
+        } else {
+          // Widget is embedded — it auto-starts when it becomes visible
+          // Make it briefly visible/interactive to trigger
+          widget.style.position = 'fixed';
+          widget.style.bottom = '10px';
+          widget.style.right = '10px';
+          widget.style.opacity = '1';
+          widget.style.pointerEvents = 'auto';
+          widget.style.zIndex = '1';
+          // Find and click the widget's start button
+          setTimeout(() => {
+            const btn = widget.shadowRoot && widget.shadowRoot.querySelector('button');
+            if (btn) btn.click();
+            // Hide it again after triggering
+            setTimeout(() => {
+              widget.style.bottom = '-9999px';
+              widget.style.opacity = '0';
+              widget.style.pointerEvents = 'none';
+            }, 500);
+          }, 200);
+        }
+        setStatus('Helen is ready — speak now', false);
+        addBubble("Hello, Bolton Practice, Helen speaking. How can I help you today?", 'helen');
+      } catch(e) {
+        console.log('Widget call attempt failed:', e);
+      }
+    } else {
+      // Widget not ready yet, retry
+      setTimeout(() => tryStartCall(widget, attempt + 1), 300);
+    }
+  }
+
+  // ── TEXT MODE: tap "Type instead" ──
+  function startTypeMode() {
+    isVoiceMode = false;
+    showChatScreen();
+    setStatus('Helen is ready', false);
+    document.getElementById('input-bar').style.display = 'flex';
+    addBubble("Hello, Bolton Practice, Helen speaking. How can I help you today?", 'helen');
+    setTimeout(() => document.getElementById('msg-input').focus(), 300);
+  }
+
+  // ── Send typed message to ElevenLabs ──
+  function sendText() {
+    const input = document.getElementById('msg-input');
+    const text = input.value.trim();
+    if (!text) return;
+
+    addBubble(text, 'user');
+    input.value = '';
+    input.style.height = 'auto';
+
+    typingEl.style.display = 'flex';
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    setStatus('Helen is thinking...', true);
+
+    // Send to ElevenLabs widget
+    const widget = document.querySelector('elevenlabs-convai');
+    let sent = false;
+
+    if (widget) {
+      try {
+        if (typeof widget.sendTextMessage === 'function') {
+          widget.sendTextMessage(text);
+          sent = true;
+        } else if (typeof widget.sendMessage === 'function') {
+          const result = widget.sendMessage(text);
+          if (result && typeof result.then === 'function') {
+            result.then(response => {
+              typingEl.style.display = 'none';
+              setStatus('Helen is ready', false);
+              if (response && typeof response === 'string') {
+                addBubble(response, 'helen');
+              }
+            }).catch(() => fallbackResponse());
+            sent = true;
+          }
+        }
+      } catch(e) {
+        console.log('sendText error:', e);
+      }
+    }
+
+    if (!sent) {
+      // Fallback: use Claude API to simulate Helen
+      callHelenaFallback(text);
+    }
+  }
+
+  // ── Fallback: use Claude API as Helen if ElevenLabs widget doesn't respond ──
+  async function callHelenaFallback(userText) {
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 200,
+          system: `You are Helen, a friendly NHS GP receptionist at Bolton Practice. 
+You ONLY help patients book GP appointments, check appointment times, or repeat prescriptions. 
+You are NOT a doctor and cannot give medical advice. 
+If someone has an emergency say: "Please call 999 immediately."
+If they need urgent medical advice say: "Please call NHS 111."
+Keep responses SHORT and friendly — max 2 sentences. 
+Always speak as Helen. This is a research prototype.`,
+          messages: [{ role: 'user', content: userText }]
+        })
+      });
+      const data = await response.json();
+      typingEl.style.display = 'none';
+      setStatus('Helen is ready', false);
+      if (data.content && data.content[0]) {
+        addBubble(data.content[0].text, 'helen');
+      }
+    } catch(e) {
+      fallbackResponse();
+    }
+  }
+
+  function fallbackResponse() {
+    typingEl.style.display = 'none';
+    setStatus('Helen is ready', false);
+    addBubble("I'm sorry, I didn't quite catch that. Could you please repeat what you need?", 'helen');
+  }
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+  }
+
+  function endSession() {
+    const widget = document.querySelector('elevenlabs-convai');
+    try {
+      if (widget && typeof widget.endSession === 'function') widget.endSession();
+    } catch(e) {}
+    sessionActive = false;
+    document.getElementById('chat-screen').style.display = 'none';
+    document.getElementById('home-screen').style.display = 'flex';
+    document.getElementById('messages').innerHTML = '';
+    typingEl.style.display = 'none';
+    document.getElementById('input-bar').style.display = 'none';
+  }
+
+  // ── Listen to ElevenLabs widget events ──
+  window.addEventListener('elevenlabs-convai:ready', () => {
+    widgetReady = true;
+    console.log('ElevenLabs widget ready');
+  });
+
+  window.addEventListener('elevenlabs-convai:call', (e) => {
+    setStatus('Helen is speaking...', true);
+    console.log('call event', e);
+  });
+
+  window.addEventListener('elevenlabs-convai:message', (e) => {
+    console.log('message event', e.detail);
+    if (e.detail && e.detail.message) {
+      typingEl.style.display = 'none';
+      if (e.detail.source === 'ai' || e.detail.role === 'assistant') {
+        addBubble(e.detail.message, 'helen');
+        setStatus('Helen is ready', false);
+      }
+      if (e.detail.source === 'user' || e.detail.role === 'user') {
+        // Only add if not already shown
+        addBubble(e.detail.message, 'user');
+        setStatus('Helen is thinking...', true);
+      }
+    }
+  });
+
+  window.addEventListener('elevenlabs-convai:audio', () => {
+    setStatus('Helen is speaking...', true);
+  });
+
+  window.addEventListener('elevenlabs-convai:idle', () => {
+    setStatus('Helen is ready', false);
+    typingEl.style.display = 'none';
+  });
+
+  window.addEventListener('elevenlabs-convai:error', (e) => {
+    console.log('ElevenLabs error:', e);
+    setStatus('Voice unavailable — type below', false);
+    document.getElementById('input-bar').style.display = 'flex';
+    showToast('Voice connection issue — please type your message');
+  });
+
+  // Mark widget ready once script loads
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => { widgetReady = true; }, 3000);
+  });
+</script>
+</body>
+</html>
