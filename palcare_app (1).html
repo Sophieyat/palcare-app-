@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Bolton Practice — GP Appointment</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --nhs: #005EB8;
+    --nhs-dark: #003F7F;
+    --nhs-light: #E8F1FA;
+    --green: #007A53;
+    --white: #ffffff;
+    --off: #F4F7FB;
+    --text: #1a1a2e;
+    --muted: #6b7a99;
+    --bubble-helen: #EAF2FF;
+    --bubble-user: #005EB8;
+    --radius: 18px;
+  }
+
+  html, body {
+    height: 100%;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--off);
+    color: var(--text);
+    overflow: hidden;
+  }
+
+  /* ── PHONE SHELL ── */
+  .phone {
+    max-width: 390px;
+    height: 100dvh;
+    margin: 0 auto;
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--nhs);
+    padding: 52px 20px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .header-logo {
+    width: 40px; height: 40px;
+    background: var(--white);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .header-logo svg { width: 26px; height: 26px; }
+  .header-text h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px;
+    color: var(--white);
+    line-height: 1.2;
+  }
+  .header-text p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.75);
+    font-weight: 300;
+  }
+  .header-status {
+    margin-left: auto;
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.85);
+  }
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #4ade80;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* ── HOME SCREEN ── */
+  #home-screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 24px;
+    gap: 28px;
+  }
+  .welcome-card {
+    background: var(--nhs-light);
+    border-radius: var(--radius);
+    padding: 20px;
+    width: 100%;
+    border-left: 4px solid var(--nhs);
+  }
+  .welcome-card h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--nhs-dark);
+    margin-bottom: 4px;
+  }
+  .welcome-card p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .mic-button {
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: var(--nhs);
+    border: none;
+    cursor: pointer;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 6px;
+    box-shadow: 0 8px 32px rgba(0,94,184,0.35);
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative;
+  }
+  .mic-button:active { transform: scale(0.95); box-shadow: 0 4px 16px rgba(0,94,184,0.3); }
+  .mic-button svg { width: 36px; height: 36px; color: white; }
+  .mic-button span { font-size: 11px; color: rgba(255,255,255,0.85); font-weight: 500; }
+  .mic-ring {
+    position: absolute;
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    border: 2px solid rgba(0,94,184,0.3);
+    animation: ring 2.5s ease-out infinite;
+    display: none;
+  }
+  .mic-ring:nth-child(2) { animation-delay: 0.8s; }
+  .mic-ring:nth-child(3) { animation-delay: 1.6s; }
+  @keyframes ring {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(1.6); opacity: 0; }
+  }
+  .mic-button.listening .mic-ring { display: block; }
+  .mic-button.listening { background: #e53e3e; box-shadow: 0 8px 32px rgba(229,62,62,0.35); }
+
+  .or-divider {
+    display: flex; align-items: center; gap: 12px;
+    width: 100%;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .or-divider::before, .or-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e2e8f0;
+  }
+
+  .type-btn {
+    width: 100%;
+    padding: 14px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    background: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .type-btn:hover { border-color: var(--nhs); background: var(--nhs-light); }
+
+  .disclaimer {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  /* ── CHAT SCREEN ── */
+  #chat-screen {
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Waveform */
+  .waveform-bar {
+    background: rgba(0,94,184,0.08);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .waveform-bars {
+    display: flex; align-items: center; gap: 3px;
+    height: 28px;
+  }
+  .waveform-bars span {
+    width: 3px;
+    border-radius: 2px;
+    background: var(--nhs);
+    height: 6px;
+    transition: height 0.15s;
+  }
+  .waveform-bars.active span { animation: wave 0.8s ease-in-out infinite; }
+  .waveform-bars.active span:nth-child(1) { animation-delay: 0s; }
+  .waveform-bars.active span:nth-child(2) { animation-delay: 0.1s; }
+  .waveform-bars.active span:nth-child(3) { animation-delay: 0.2s; }
+  .waveform-bars.active span:nth-child(4) { animation-delay: 0.3s; }
+  .waveform-bars.active span:nth-child(5) { animation-delay: 0.4s; }
+  .waveform-bars.active span:nth-child(6) { animation-delay: 0.3s; }
+  .waveform-bars.active span:nth-child(7) { animation-delay: 0.2s; }
+  @keyframes wave {
+    0%,100% { height: 4px; }
+    50% { height: 22px; }
+  }
+  .waveform-label {
+    font-size: 12px;
+    color: var(--nhs);
+    font-weight: 500;
+  }
+
+  /* Messages */
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .bubble {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.5;
+    animation: bubbleIn 0.2s ease-out;
+  }
+  @keyframes bubbleIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .bubble.helen {
+    background: var(--bubble-helen);
+    color: var(--text);
+    border-bottom-left-radius: 4px;
+    align-self: flex-start;
+  }
+  .bubble.helen .sender {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--nhs);
+    margin-bottom: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .bubble.user {
+    background: var(--bubble-user);
+    color: white;
+    border-bottom-right-radius: 4px;
+    align-self: flex-end;
+  }
+  .typing-indicator {
+    display: flex; gap: 4px; align-items: center;
+    padding: 12px 16px;
+    background: var(--bubble-helen);
+    border-radius: 18px;
+    border-bottom-left-radius: 4px;
+    align-self: flex-start;
+    display: none;
+  }
+  .typing-indicator span {
+    width: 6px; height: 6px;
+    background: var(--muted);
+    border-radius: 50%;
+    animation: typing 1.2s infinite;
+  }
+  .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typing { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+  /* Input bar */
+  .input-bar {
+    padding: 12px 16px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+    background: var(--white);
+    border-top: 1px solid #e8eef5;
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+    flex-shrink: 0;
+  }
+  .input-bar textarea {
+    flex: 1;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 10px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    max-height: 100px;
+    line-height: 1.4;
+    transition: border-color 0.2s;
+  }
+  .input-bar textarea:focus { border-color: var(--nhs); }
+  .send-btn, .voice-btn {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.15s;
+  }
+  .send-btn:active, .voice-btn:active { transform: scale(0.9); }
+  .send-btn { background: var(--nhs); }
+  .send-btn svg { color: white; width: 18px; height: 18px; }
+  .voice-btn { background: var(--off); border: 1.5px solid #e2e8f0; }
+  .voice-btn svg { color: var(--nhs); width: 18px; height: 18px; }
+  .voice-btn.recording { background: #fee2e2; border-color: #e53e3e; }
+  .voice-btn.recording svg { color: #e53e3e; }
+
+  /* ElevenLabs widget hidden */
+  elevenlabs-convai { display: none !important; }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-logo">
+      <svg viewBox="0 0 26 26" fill="none">
+        <circle cx="13" cy="13" r="12" fill="#005EB8"/>
+        <polyline points="4,13 8,13 10,8 13,18 16,10 18,13 22,13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <text x="13" y="24" text-anchor="middle" font-size="5" fill="white" font-family="sans-serif">Bolton Practice</text>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>Bolton Practice</h1>
+      <p>GP appointment booking</p>
+    </div>
+    <div class="header-status">
+      <div class="status-dot"></div>
+      <span>Online</span>
+    </div>
+  </div>
+
+  <!-- HOME SCREEN -->
+  <div id="home-screen">
+    <div class="welcome-card">
+      <h2>Hello, welcome</h2>
+      <p>This is a research prototype. Tap the microphone to speak with Helen, or type your message below.</p>
+    </div>
+
+    <button class="mic-button" id="start-voice-btn" onclick="startVoice()">
+      <div class="mic-ring"></div>
+      <div class="mic-ring"></div>
+      <div class="mic-ring"></div>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+        <line x1="12" y1="19" x2="12" y2="23"/>
+        <line x1="8" y1="23" x2="16" y2="23"/>
+      </svg>
+      <span>Tap to speak</span>
+    </button>
+
+    <div class="or-divider">or</div>
+
+    <button class="type-btn" onclick="startChat()">Type your message instead</button>
+
+    <p class="disclaimer">This is a research prototype — not a real GP service.<br>University of Roehampton · MSc Digital Health</p>
+  </div>
+
+  <!-- CHAT SCREEN -->
+  <div id="chat-screen">
+    <div class="waveform-bar">
+      <div class="waveform-bars" id="waveform">
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <span class="waveform-label" id="waveform-label">Helen is ready</span>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="bubble helen">
+        <div class="sender">Helen · Bolton Practice</div>
+        Hello, Bolton Practice, Helen speaking. How can I help you today?
+      </div>
+    </div>
+
+    <div class="typing-indicator" id="typing">
+      <span></span><span></span><span></span>
+    </div>
+
+    <div class="input-bar">
+      <textarea id="msg-input" placeholder="Type your message..." rows="1"
+        oninput="autoResize(this)"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendText();}">
+      </textarea>
+      <button class="voice-btn" id="voice-btn" onclick="toggleVoiceInput()" title="Speak">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+          <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+      </button>
+      <button class="send-btn" onclick="sendText()" title="Send">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ElevenLabs widget (hidden — handles voice AI) -->
+<elevenlabs-convai agent-id="agent_6701kt0ajthff0k8qws2fwhwpw47"></elevenlabs-convai>
+<script src="https://elevenlabs.io/convai-widget/index.js" async></script>
+
+<script>
+  const messages = document.getElementById('messages');
+  const typing = document.getElementById('typing');
+  const waveform = document.getElementById('waveform');
+  const waveformLabel = document.getElementById('waveform-label');
+  let recognition = null;
+  let isRecording = false;
+
+  function startVoice() {
+    showChat();
+    setTimeout(() => toggleVoiceInput(), 300);
+  }
+
+  function startChat() {
+    showChat();
+    setTimeout(() => document.getElementById('msg-input').focus(), 300);
+  }
+
+  function showChat() {
+    document.getElementById('home-screen').style.display = 'none';
+    document.getElementById('chat-screen').style.display = 'flex';
+    waveform.classList.add('active');
+    waveformLabel.textContent = 'Helen is ready';
+    setTimeout(() => waveform.classList.remove('active'), 2000);
+  }
+
+  function addBubble(text, who) {
+    const div = document.createElement('div');
+    div.className = 'bubble ' + who;
+    if (who === 'helen') {
+      div.innerHTML = '<div class="sender">Helen · Bolton Practice</div>' + escapeHtml(text);
+    } else {
+      div.textContent = text;
+    }
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function escapeHtml(t) {
+    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function showTyping() {
+    typing.style.display = 'flex';
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function hideTyping() {
+    typing.style.display = 'none';
+  }
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+  }
+
+  function sendText() {
+    const input = document.getElementById('msg-input');
+    const text = input.value.trim();
+    if (!text) return;
+    addBubble(text, 'user');
+    input.value = '';
+    input.style.height = 'auto';
+    showTyping();
+    waveform.classList.add('active');
+    waveformLabel.textContent = 'Helen is thinking...';
+    // Pass to ElevenLabs widget
+    const widget = document.querySelector('elevenlabs-convai');
+    if (widget && widget.sendMessage) {
+      widget.sendMessage(text).then(response => {
+        hideTyping();
+        waveform.classList.remove('active');
+        waveformLabel.textContent = 'Helen is ready';
+        if (response) addBubble(response, 'helen');
+      });
+    } else {
+      setTimeout(() => {
+        hideTyping();
+        waveform.classList.remove('active');
+        waveformLabel.textContent = 'Helen is ready';
+      }, 1500);
+    }
+  }
+
+  function toggleVoiceInput() {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      alert('Voice input is not supported on this browser. Please use Chrome.');
+      return;
+    }
+    const btn = document.getElementById('voice-btn');
+    if (isRecording) {
+      recognition && recognition.stop();
+      isRecording = false;
+      btn.classList.remove('recording');
+      waveformLabel.textContent = 'Helen is ready';
+      waveform.classList.remove('active');
+      return;
+    }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SR();
+    recognition.lang = 'en-GB';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.onstart = () => {
+      isRecording = true;
+      btn.classList.add('recording');
+      waveform.classList.add('active');
+      waveformLabel.textContent = 'Listening...';
+    };
+    recognition.onresult = (e) => {
+      const text = e.results[0][0].transcript;
+      document.getElementById('msg-input').value = text;
+      sendText();
+    };
+    recognition.onend = () => {
+      isRecording = false;
+      btn.classList.remove('recording');
+    };
+    recognition.start();
+  }
+
+  // Listen to ElevenLabs widget events for transcript bubbles
+  window.addEventListener('elevenlabs-convai:call', () => {
+    waveform.classList.add('active');
+    waveformLabel.textContent = 'Helen is speaking...';
+  });
+  window.addEventListener('elevenlabs-convai:message', (e) => {
+    if (e.detail && e.detail.message) {
+      if (e.detail.source === 'ai') addBubble(e.detail.message, 'helen');
+      if (e.detail.source === 'user') addBubble(e.detail.message, 'user');
+    }
+  });
+  window.addEventListener('elevenlabs-convai:idle', () => {
+    waveform.classList.remove('active');
+    waveformLabel.textContent = 'Helen is ready';
+  });
+</script>
+</body>
+</html>
