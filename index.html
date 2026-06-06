@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Bolton Practice — GP Appointment</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --nhs: #005EB8; --nhs-dark: #003F7F; --nhs-light: #E8F1FA;
+    --white: #fff; --off: #F4F7FB; --text: #1a1a2e; --muted: #6b7a99;
+    --helen: #EAF2FF; --user: #005EB8;
+  }
+  html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--off); color: var(--text); overflow: hidden; }
+  .phone { max-width: 390px; height: 100dvh; margin: 0 auto; background: var(--white); display: flex; flex-direction: column; overflow: hidden; }
+
+  .header { background: var(--nhs); padding: 52px 20px 16px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .header-logo { width: 40px; height: 40px; background: var(--white); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .header-logo svg { width: 26px; height: 26px; }
+  .header-text h1 { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--white); line-height: 1.2; }
+  .header-text p { font-size: 12px; color: rgba(255,255,255,0.75); font-weight: 300; }
+  .header-status { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 12px; color: rgba(255,255,255,0.85); }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* HOME */
+  #home { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; gap: 28px; }
+  .card { background: var(--nhs-light); border-radius: 18px; padding: 20px; width: 100%; border-left: 4px solid var(--nhs); }
+  .card h2 { font-size: 18px; font-weight: 700; color: var(--nhs-dark); margin-bottom: 6px; }
+  .card p { font-size: 16px; color: var(--muted); line-height: 1.6; }
+  .mic-big { width: 140px; height: 140px; border-radius: 50%; background: var(--nhs); border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 8px 32px rgba(0,94,184,0.35); position: relative; -webkit-tap-highlight-color: transparent; transition: transform 0.15s; }
+  .mic-big:active { transform: scale(0.95); }
+  .mic-big svg { width: 44px; height: 44px; color: white; }
+  .mic-big span { font-size: 14px; font-weight: 700; color: white; }
+  .ring { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(0,94,184,0.3); animation: ring 2.5s ease-out infinite; }
+  .ring:nth-child(2){animation-delay:0.8s} .ring:nth-child(3){animation-delay:1.6s}
+  @keyframes ring { 0%{transform:scale(1);opacity:0.8} 100%{transform:scale(1.6);opacity:0} }
+  .note { font-size: 12px; color: var(--muted); text-align: center; line-height: 1.6; }
+
+  /* VOICE */
+  #voice { flex: 1; display: none; flex-direction: column; overflow: hidden; }
+  .bar { background: var(--nhs); padding: 10px 16px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .waves { display: flex; align-items: center; gap: 3px; height: 24px; }
+  .waves span { width: 3px; border-radius: 2px; background: rgba(255,255,255,0.6); height: 4px; }
+  .waves.on span { animation: wv 0.6s ease-in-out infinite; }
+  .waves.on span:nth-child(1){animation-delay:0s}.waves.on span:nth-child(2){animation-delay:.1s}.waves.on span:nth-child(3){animation-delay:.2s}.waves.on span:nth-child(4){animation-delay:.3s}.waves.on span:nth-child(5){animation-delay:.4s}.waves.on span:nth-child(6){animation-delay:.3s}.waves.on span:nth-child(7){animation-delay:.2s}
+  @keyframes wv { 0%,100%{height:3px} 50%{height:18px} }
+  .bar-txt { font-size: 14px; font-weight: 600; color: white; }
+  .end-btn { margin-left: auto; padding: 6px 16px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); border-radius: 20px; font-size: 13px; font-weight: 600; color: white; cursor: pointer; }
+
+  .transcript { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+  .empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: var(--muted); text-align: center; }
+  .empty svg { width: 52px; height: 52px; opacity: 0.2; }
+  .empty p { font-size: 16px; font-weight: 600; line-height: 1.6; }
+
+  /* BUBBLES — 18px bold sans-serif */
+  .bubble { max-width: 85%; padding: 14px 18px; border-radius: 20px; font-size: 18px; font-weight: 700; font-family: 'DM Sans', sans-serif; line-height: 1.5; animation: pop .2s ease-out; }
+  @keyframes pop { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .bubble.helen { background: var(--helen); color: var(--text); border-bottom-left-radius: 4px; align-self: flex-start; }
+  .bubble.helen .who { font-size: 11px; font-weight: 700; color: var(--nhs); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.6px; }
+  .bubble.user { background: var(--user); color: white; border-bottom-right-radius: 4px; align-self: flex-end; }
+  .bubble.user .who { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.7); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.6px; }
+
+  .mic-area { flex-shrink: 0; padding: 16px; background: var(--white); border-top: 1px solid #e8eef5; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .mic-small { width: 64px; height: 64px; border-radius: 50%; background: var(--nhs); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,94,184,0.3); -webkit-tap-highlight-color: transparent; }
+  .mic-small.talking { background: #dc2626; }
+  .mic-small svg { width: 26px; height: 26px; color: white; }
+  .mic-label { font-size: 13px; font-weight: 600; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="header">
+    <div class="header-logo">
+      <svg viewBox="0 0 26 26" fill="none">
+        <circle cx="13" cy="13" r="12" fill="#005EB8"/>
+        <polyline points="4,13 8,13 10,8 13,18 16,10 18,13 22,13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>Bolton Practice</h1>
+      <p>GP appointment booking</p>
+    </div>
+    <div class="header-status">
+      <div class="status-dot"></div>
+      <span>Online</span>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div id="home">
+    <div class="card">
+      <h2>Hello, welcome</h2>
+      <p>Tap the microphone to speak with Helen, our receptionist. She will help you book a GP appointment.</p>
+    </div>
+    <button class="mic-big" id="start-btn" onclick="startCall()">
+      <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+        <line x1="12" y1="19" x2="12" y2="23"/>
+        <line x1="8" y1="23" x2="16" y2="23"/>
+      </svg>
+      <span>Tap to speak</span>
+    </button>
+    <p class="note">⚠️ Research prototype — not a real GP service<br>University of Roehampton · MSc Digital Health</p>
+  </div>
+
+  <!-- VOICE -->
+  <div id="voice">
+    <div class="bar">
+      <div class="waves" id="waves"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      <span class="bar-txt" id="bar-txt">Connecting...</span>
+      <button class="end-btn" onclick="endCall()">End call</button>
+    </div>
+    <div class="transcript" id="transcript">
+      <div class="empty" id="empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+          <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+        <p>Your conversation with Helen<br>will appear here</p>
+      </div>
+    </div>
+    <div class="mic-area">
+      <button class="mic-small" id="mic-small">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+          <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+      </button>
+      <span class="mic-label" id="mic-label">Microphone active</span>
+    </div>
+  </div>
+</div>
+
+<!-- ElevenLabs Client SDK — correct package -->
+<script src="https://unpkg.com/@elevenlabs/client/dist/index.umd.js"></script>
+
+<script>
+  const AGENT_ID = 'agent_6701kt0ajthff0k8qws2fwhwpw47';
+  let conv = null;
+
+  const wavesEl   = document.getElementById('waves');
+  const barTxt    = document.getElementById('bar-txt');
+  const transcEl  = document.getElementById('transcript');
+  const emptyEl   = document.getElementById('empty');
+  const micSmall  = document.getElementById('mic-small');
+  const micLabel  = document.getElementById('mic-label');
+
+  function setSt(txt, anim) {
+    barTxt.textContent = txt;
+    anim ? wavesEl.classList.add('on') : wavesEl.classList.remove('on');
+  }
+
+  function addBubble(text, who) {
+    if (!text || text.trim().length < 2) return;
+    emptyEl.style.display = 'none';
+    const d = document.createElement('div');
+    d.className = 'bubble ' + who;
+    const label = who === 'helen' ? 'Helen · Bolton Practice' : 'You';
+    d.innerHTML = `<div class="who">${label}</div>${text.trim().replace(/</g,'&lt;')}`;
+    transcEl.appendChild(d);
+    transcEl.scrollTop = transcEl.scrollHeight;
+  }
+
+  async function startCall() {
+    document.getElementById('home').style.display = 'none';
+    document.getElementById('voice').style.display = 'flex';
+    setSt('Connecting to Helen...', true);
+
+    try {
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+
+      // Use the correct ElevenLabs client SDK
+      const { Conversation } = window.ElevenLabs || window['@elevenlabs/client'] || {};
+
+      if (!Conversation) {
+        // Fallback — try direct import path
+        throw new Error('SDK not loaded');
+      }
+
+      conv = await Conversation.startSession({
+        agentId: AGENT_ID,
+
+        onConnect: () => setSt('Helen is ready', false),
+
+        onDisconnect: () => {
+          setSt('Call ended', false);
+          micSmall.classList.remove('talking');
+          micLabel.textContent = 'Call ended';
+        },
+
+        onError: (e) => {
+          console.error('EL Error:', e);
+          setSt('Error — please try again', false);
+        },
+
+        onModeChange: ({ mode }) => {
+          if (mode === 'speaking') {
+            setSt('Helen is speaking...', true);
+            micSmall.classList.remove('talking');
+            micLabel.textContent = 'Helen is speaking...';
+          } else {
+            setSt('Listening...', false);
+            micSmall.classList.add('talking');
+            micLabel.textContent = 'Listening — speak now';
+          }
+        },
+
+        // Helen's responses — this is the key transcript event
+        onMessage: ({ message, source }) => {
+          console.log('onMessage:', source, message);
+          if (source === 'ai' || source === 'agent' || !source) {
+            addBubble(message, 'helen');
+          } else if (source === 'user') {
+            addBubble(message, 'user');
+          }
+        },
+
+        // User transcript — what the participant says
+        onUserTranscript: ({ message }) => {
+          console.log('onUserTranscript:', message);
+          addBubble(message, 'user');
+        },
+      });
+
+    } catch(err) {
+      console.error('Start error:', err);
+      // Try alternate SDK path
+      tryAlternateSdk();
+    }
+  }
+
+  async function tryAlternateSdk() {
+    try {
+      // The UMD build may expose differently
+      const SDKRoot = window.ElevenLabsClient || window.elevenlabs || window['elevenlabs-client'];
+      const Conversation = SDKRoot?.Conversation || SDKRoot?.default?.Conversation;
+
+      if (!Conversation) {
+        setSt('Could not connect — try refreshing', false);
+        return;
+      }
+
+      conv = await Conversation.startSession({
+        agentId: AGENT_ID,
+        onConnect: () => setSt('Helen is ready', false),
+        onDisconnect: () => setSt('Call ended', false),
+        onError: (e) => { console.error(e); setSt('Error', false); },
+        onModeChange: ({ mode }) => {
+          if (mode === 'speaking') setSt('Helen is speaking...', true);
+          else { setSt('Listening...', false); micSmall.classList.add('talking'); }
+        },
+        onMessage: ({ message, source }) => {
+          console.log('msg:', source, message);
+          addBubble(message, source === 'user' ? 'user' : 'helen');
+        },
+        onUserTranscript: ({ message }) => addBubble(message, 'user'),
+      });
+    } catch(e) {
+      console.error('Alt SDK error:', e);
+      setSt('Connection failed — check internet', false);
+    }
+  }
+
+  async function endCall() {
+    if (conv) {
+      try { await conv.endSession(); } catch(e) {}
+      conv = null;
+    }
+    document.getElementById('voice').style.display = 'none';
+    document.getElementById('home').style.display = 'flex';
+    transcEl.innerHTML = '';
+    transcEl.appendChild(emptyEl);
+    emptyEl.style.display = 'flex';
+    setSt('Connecting...', false);
+    micSmall.classList.remove('talking');
+  }
+</script>
+</body>
+</html>
