@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Bolton Practice — GP Appointment</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --nhs: #005EB8; --nhs-dark: #003F7F; --nhs-light: #E8F1FA;
+    --white: #fff; --off: #F4F7FB; --text: #1a1a2e; --muted: #6b7a99;
+    --helen: #EAF2FF; --user: #005EB8; --green: #16a34a;
+  }
+  html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--off); color: var(--text); overflow: hidden; }
+  .phone { max-width: 390px; height: 100dvh; margin: 0 auto; background: var(--white); display: flex; flex-direction: column; overflow: hidden; }
+
+  .header { background: var(--nhs); padding: 52px 20px 16px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .header-logo { width: 40px; height: 40px; background: var(--white); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .header-logo svg { width: 26px; height: 26px; }
+  .header-text h1 { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--white); line-height: 1.2; }
+  .header-text p { font-size: 12px; color: rgba(255,255,255,0.75); font-weight: 300; }
+  .header-status { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 12px; color: rgba(255,255,255,0.85); }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  #home { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; gap: 28px; }
+  .card { background: var(--nhs-light); border-radius: 18px; padding: 20px; width: 100%; border-left: 4px solid var(--nhs); }
+  .card h2 { font-size: 18px; font-weight: 700; color: var(--nhs-dark); margin-bottom: 6px; }
+  .card p { font-size: 16px; color: var(--muted); line-height: 1.6; }
+  .mic-big { width: 140px; height: 140px; border-radius: 50%; background: var(--nhs); border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 8px 32px rgba(0,94,184,0.35); position: relative; -webkit-tap-highlight-color: transparent; transition: transform 0.15s; }
+  .mic-big:active { transform: scale(0.95); }
+  .mic-big svg { width: 44px; height: 44px; color: white; }
+  .mic-big span { font-size: 14px; font-weight: 700; color: white; }
+  .ring { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(0,94,184,0.3); animation: ring 2.5s ease-out infinite; }
+  .ring:nth-child(2){animation-delay:0.8s} .ring:nth-child(3){animation-delay:1.6s}
+  @keyframes ring { 0%{transform:scale(1);opacity:0.8} 100%{transform:scale(1.6);opacity:0} }
+  .note { font-size: 12px; color: var(--muted); text-align: center; line-height: 1.6; }
+
+  #connecting { flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; gap: 24px; }
+  .spinner { width: 80px; height: 80px; border-radius: 50%; border: 4px solid var(--nhs-light); border-top-color: var(--nhs); animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .conn-title { font-size: 22px; font-weight: 700; color: var(--nhs-dark); text-align: center; }
+  .conn-sub { font-size: 15px; color: var(--muted); text-align: center; line-height: 1.6; }
+  .conn-timer { font-size: 13px; color: var(--muted); font-weight: 600; }
+
+  #voice { flex: 1; display: none; flex-direction: column; overflow: hidden; }
+  .bar { padding: 12px 16px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; transition: background 0.4s; background: #1e3a5f; }
+  .bar.helen-speaking { background: var(--nhs); }
+  .bar.user-speaking { background: var(--green); }
+  .bar.listening { background: #1e3a5f; }
+  .bar.thinking { background: #92400e; }
+  .bar.ended { background: #1e293b; }
+
+  .waves { display: flex; align-items: center; gap: 3px; height: 24px; }
+  .waves span { width: 3px; border-radius: 2px; background: rgba(255,255,255,0.7); height: 4px; }
+  .waves.on span { animation: wv 0.6s ease-in-out infinite; }
+  .waves.on span:nth-child(1){animation-delay:0s}.waves.on span:nth-child(2){animation-delay:.1s}.waves.on span:nth-child(3){animation-delay:.2s}.waves.on span:nth-child(4){animation-delay:.3s}.waves.on span:nth-child(5){animation-delay:.4s}.waves.on span:nth-child(6){animation-delay:.3s}.waves.on span:nth-child(7){animation-delay:.2s}
+  @keyframes wv { 0%,100%{height:3px} 50%{height:20px} }
+  .bar-txt { font-size: 15px; font-weight: 700; color: white; }
+  .end-btn { margin-left: auto; padding: 8px 18px; background: rgba(255,255,255,0.25); border: 2px solid rgba(255,255,255,0.6); border-radius: 24px; font-size: 14px; font-weight: 700; color: white; cursor: pointer; white-space: nowrap; }
+  .end-btn.pulse { animation: btnpulse 1s ease-in-out infinite; background: white; color: var(--nhs); border-color: white; }
+  @keyframes btnpulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+
+  .transcript { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+  .empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: var(--muted); text-align: center; }
+  .empty svg { width: 52px; height: 52px; opacity: 0.2; }
+  .empty p { font-size: 16px; font-weight: 600; line-height: 1.6; }
+
+  .bubble { max-width: 85%; padding: 14px 18px; border-radius: 20px; font-size: 18px; font-weight: 700; font-family: 'DM Sans', sans-serif; line-height: 1.5; animation: pop .2s ease-out; }
+  @keyframes pop { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .bubble.helen { background: var(--helen); color: var(--text); border-bottom-left-radius: 4px; align-self: flex-start; }
+  .bubble.helen .who { font-size: 11px; font-weight: 700; color: var(--nhs); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.6px; }
+  .bubble.user { background: var(--user); color: white; border-bottom-right-radius: 4px; align-self: flex-end; }
+  .bubble.user .who { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.7); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.6px; }
+
+  .mic-area { flex-shrink: 0; padding: 14px 16px; background: var(--white); border-top: 1px solid #e8eef5; display: flex; align-items: center; justify-content: center; gap: 16px; }
+  .mic-indicator { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.3s; background: var(--nhs-light); }
+  .mic-indicator.helen svg { color: var(--nhs); }
+  .mic-indicator.user { background: #dcfce7; }
+  .mic-indicator.user svg { color: var(--green); }
+  .mic-indicator svg { width: 28px; height: 28px; color: var(--nhs); }
+  .turn-label { font-size: 15px; font-weight: 700; color: var(--text); text-align: center; line-height: 1.4; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="header">
+    <div class="header-logo">
+      <svg viewBox="0 0 26 26" fill="none">
+        <circle cx="13" cy="13" r="12" fill="#005EB8"/>
+        <polyline points="4,13 8,13 10,8 13,18 16,10 18,13 22,13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>Bolton Practice</h1>
+      <p>GP appointment booking</p>
+    </div>
+    <div class="header-status">
+      <div class="status-dot"></div>
+      <span>Online</span>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div id="home">
+    <div class="card">
+      <h2>Hello, welcome</h2>
+      <p>Tap the microphone below to speak with Helen, our receptionist. She will help you book a GP appointment.</p>
+    </div>
+    <button class="mic-big" onclick="startCall()">
+      <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+        <line x1="12" y1="19" x2="12" y2="23"/>
+        <line x1="8" y1="23" x2="16" y2="23"/>
+      </svg>
+      <span>Tap to speak</span>
+    </button>
+    <p class="note">⚠️ Research prototype — not a real GP service<br>University of Roehampton · MSc Digital Health</p>
+  </div>
+
+  <!-- CONNECTING -->
+  <div id="connecting">
+    <div class="spinner"></div>
+    <div class="conn-title">Connecting to Helen...</div>
+    <div class="conn-sub">Please wait a moment.<br>This usually takes a few seconds.</div>
+    <div class="conn-timer" id="timer">0 seconds</div>
+  </div>
+
+  <!-- VOICE -->
+  <div id="voice">
+    <div class="bar listening" id="bar">
+      <div class="waves" id="waves"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      <span class="bar-txt" id="bar-txt">Ready</span>
+      <button class="end-btn" id="end-btn" onclick="endCall()">End call</button>
+    </div>
+    <div class="transcript" id="transcript">
+      <div class="empty" id="empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+          <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+        <p>Your conversation with Helen<br>will appear here as you speak</p>
+      </div>
+    </div>
+    <div class="mic-area">
+      <div class="mic-indicator" id="mic-indicator">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+          <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+      </div>
+      <span class="turn-label" id="turn-label">Speak to begin</span>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { Conversation } from 'https://cdn.jsdelivr.net/npm/@elevenlabs/client@0.12.2/+esm';
+
+  const AGENT_ID = 'agent_6701kt0ajthff0k8qws2fwhwpw47';
+  let conv = null;
+  let timerInterval = null;
+  let timerSecs = 0;
+
+  const barEl     = document.getElementById('bar');
+  const wavesEl   = document.getElementById('waves');
+  const barTxt    = document.getElementById('bar-txt');
+  const endBtn    = document.getElementById('end-btn');
+  const transcEl  = document.getElementById('transcript');
+  const emptyEl   = document.getElementById('empty');
+  const micInd    = document.getElementById('mic-indicator');
+  const turnLabel = document.getElementById('turn-label');
+  const timerEl   = document.getElementById('timer');
+
+  function setBar(mode) {
+    barEl.className = 'bar ' + mode;
+    wavesEl.classList.remove('on');
+    endBtn.classList.remove('pulse');
+    micInd.className = 'mic-indicator';
+
+    if (mode === 'helen-speaking') {
+      barTxt.textContent = 'Helen is speaking...';
+      wavesEl.classList.add('on');
+      turnLabel.textContent = 'Helen is speaking';
+    } else if (mode === 'user-speaking') {
+      barTxt.textContent = 'You are speaking...';
+      wavesEl.classList.add('on');
+      turnLabel.textContent = 'You are speaking';
+      micInd.classList.add('user');
+    } else if (mode === 'listening') {
+      barTxt.textContent = 'Speak now — Helen is listening';
+      turnLabel.textContent = 'Your turn — speak now';
+      micInd.classList.add('user');
+    } else if (mode === 'thinking') {
+      barTxt.textContent = 'Helen is thinking...';
+      turnLabel.textContent = 'Helen is thinking...';
+    } else if (mode === 'ended') {
+      barTxt.textContent = 'Call ended — tap End call';
+      endBtn.classList.add('pulse');
+      turnLabel.textContent = 'Tap End call to finish';
+    }
+  }
+
+  function addBubble(text, who) {
+    if (!text || text.trim().length < 2) return;
+    const clean = text.replace(/\[.*?\]/g, '').trim();
+    if (!clean) return;
+    emptyEl.style.display = 'none';
+    const d = document.createElement('div');
+    d.className = 'bubble ' + who;
+    const label = who === 'helen' ? 'Helen · Bolton Practice' : 'You';
+    d.innerHTML = `<div class="who">${label}</div>${clean.replace(/</g,'&lt;')}`;
+    transcEl.appendChild(d);
+    transcEl.scrollTop = transcEl.scrollHeight;
+  }
+
+  function startTimer() {
+    timerSecs = 0;
+    timerEl.textContent = '0 seconds';
+    timerInterval = setInterval(() => {
+      timerSecs++;
+      timerEl.textContent = timerSecs + ' second' + (timerSecs === 1 ? '' : 's');
+    }, 1000);
+  }
+
+  function stopTimer() {
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  }
+
+  window.startCall = async function() {
+    document.getElementById('home').style.display = 'none';
+    document.getElementById('connecting').style.display = 'flex';
+    startTimer();
+
+    try {
+      conv = await Conversation.startSession({
+        agentId: AGENT_ID,
+        connectionType: 'websocket',
+
+        onConnect: () => {
+          stopTimer();
+          document.getElementById('connecting').style.display = 'none';
+          document.getElementById('voice').style.display = 'flex';
+          setBar('listening');
+        },
+
+        onDisconnect: () => {
+          stopTimer();
+          setBar('ended');
+        },
+
+        onError: (e) => {
+          stopTimer();
+          console.error(e);
+          document.getElementById('connecting').style.display = 'none';
+          document.getElementById('home').style.display = 'flex';
+          alert('Could not connect to Helen. Please check your internet and try again.');
+        },
+
+        onModeChange: ({ mode }) => {
+          if (mode === 'speaking') setBar('helen-speaking');
+          else setBar('listening');
+        },
+
+        onMessage: ({ message, source }) => {
+          const clean = (message || '').replace(/\[.*?\]/g, '').trim();
+          if (!clean) return;
+          if (source === 'user') addBubble(clean, 'user');
+          else addBubble(clean, 'helen');
+        },
+
+        onUserTranscript: ({ message }) => {
+          const clean = (message || '').replace(/\[.*?\]/g, '').trim();
+          if (clean) { addBubble(clean, 'user'); setBar('thinking'); }
+        }
+      });
+
+    } catch(e) {
+      stopTimer();
+      console.error(e);
+      document.getElementById('connecting').style.display = 'none';
+      document.getElementById('home').style.display = 'flex';
+      alert('Could not access microphone. Please allow microphone access and try again.');
+    }
+  }
+
+  window.endCall = async function() {
+    stopTimer();
+    if (conv) { try { await conv.endSession(); } catch(e){} conv = null; }
+    document.getElementById('voice').style.display = 'none';
+    document.getElementById('home').style.display = 'flex';
+    transcEl.innerHTML = '';
+    transcEl.appendChild(emptyEl);
+    emptyEl.style.display = 'flex';
+    endBtn.classList.remove('pulse');
+  }
+</script>
+</body>
+</html>
