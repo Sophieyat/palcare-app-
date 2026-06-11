@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Bolton Practice — GP Appointment</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --nhs: #005EB8; --nhs-dark: #003F7F; --nhs-light: #E8F1FA;
+    --white: #fff; --off: #F4F7FB; --text: #1a1a2e; --muted: #6b7a99;
+  }
+  html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--off); color: var(--text); overflow: hidden; }
+  
+  .phone { 
+    max-width: 390px; 
+    height: 100vh; 
+    height: -webkit-fill-available;
+    margin: 0 auto; 
+    background: var(--white); 
+    display: flex; 
+    flex-direction: column; 
+    overflow: hidden; 
+    position: relative;
+  }
+
+  .header { background: var(--nhs); padding: 52px 20px 16px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .header-logo { width: 40px; height: 40px; background: var(--white); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .header-logo svg { width: 26px; height: 26px; }
+  .header-text h1 { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--white); line-height: 1.2; }
+  .header-text p { font-size: 12px; color: rgba(255,255,255,0.75); font-weight: 300; }
+  .header-status { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 12px; color: rgba(255,255,255,0.85); }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  #home { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; gap: 28px; }
+  .card { background: var(--nhs-light); border-radius: 18px; padding: 25px; width: 100%; border-left: 4px solid var(--nhs); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+  .card h2 { font-size: 20px; font-weight: 700; color: var(--nhs-dark); margin-bottom: 8px; }
+  .card p { font-size: 16px; color: var(--text); line-height: 1.6; }
+  
+  .instruction-box { text-align: center; margin-top: 10px; padding: 10px; }
+  .instruction-box p { font-size: 15px; font-weight: 600; color: var(--nhs-dark); margin-bottom: 8px; }
+  
+  .note { font-size: 12px; color: var(--muted); text-align: center; line-height: 1.6; margin-top: auto; }
+
+  elevenlabs-convai {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+  }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="header">
+    <div class="header-logo">
+      <svg viewBox="0 0 26 26" fill="none">
+        <circle cx="13" cy="13" r="12" fill="#005EB8"/>
+        <polyline points="4,13 8,13 10,8 13,18 16,10 18,13 22,13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>Bolton Practice</h1>
+      <p>GP appointment booking</p>
+    </div>
+    <div class="header-status">
+      <div class="status-dot"></div>
+      <span>Online</span>
+    </div>
+  </div>
+
+  <!-- HOME SCREEN -->
+  <div id="home">
+    <div class="card">
+      <h2>Hello, welcome</h2>
+      <p>Speak with Helen, our virtual receptionist. She will help you navigate your symptoms and book a GP appointment seamlessly.</p>
+    </div>
+    
+    <div class="instruction-box">
+      <p>👇 Tap the blue button below to start your call</p>
+    </div>
+
+    <p class="note">⚠️ Research prototype — not a real GP service<br>University of Roehampton · MSc Digital Health</p>
+  </div>
+
+  <!-- OFFICIAL ELEVENLABS WIDGET EMBED -->
+  <elevenlabs-convai agent-id="agent_6701kt0ajthff0k8qws2fwhwpw47"></elevenlabs-convai>
+  <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
+
+</div>
+</body>
+</html>
