@@ -1,0 +1,21 @@
+{
+  "name": "Bolton Practice GP Booking",
+  "short_name": "PalCare",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F4F7FB",
+  "theme_color": "#005EB8",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://img.icons8.com/color/192/ffffff/heart-health.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://img.icons8.com/color/512/ffffff/heart-health.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
